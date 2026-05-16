@@ -28,7 +28,7 @@ const translations = {
   },
 };
 
-function getReply(msg, lang) {
+function getReply(msg: string, lang: string) {
   const m = msg.toLowerCase();
   const isEn = lang === "en";
   if (m.includes("password") || m.includes("reset")) return isEn ? "🔐 To reset password: Go to Login → Forgot Password" : "🔐 Reset password: Buka Login → Lupa Password";
@@ -52,12 +52,12 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState("chat");
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<{ role: string; content: string; time: number }[]>([]);
   const [input, setInput] = useState("");
   const [typing, setTyping] = useState(false);
-  const endRef = useRef(null);
+  const endRef = useRef<HTMLDivElement>(null);
 
-  const t = translations[lang];
+  const t = translations[lang as keyof typeof translations];
 
   useEffect(() => {
     setMounted(true);
@@ -75,7 +75,7 @@ export default function Home() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, typing]);
 
-  const sendMessage = (text) => {
+  const sendMessage = (text?: string) => {
     const msg = (text || input).trim();
     if (!msg) return;
     setInput("");
@@ -95,7 +95,6 @@ export default function Home() {
         
         {mobileMenuOpen && <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setMobileMenuOpen(false)} />}
 
-        {/* SIDEBAR */}
         <aside className={`fixed md:relative z-30 h-full flex flex-col transition-all duration-300 ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"} ${sidebarOpen ? "w-64" : "md:w-20 w-64"} ${darkMode ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200"} border-r`}>
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700">
             {sidebarOpen ? (
@@ -123,7 +122,6 @@ export default function Home() {
             </button>
           </nav>
 
-          {/* Language Toggle */}
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex gap-1">
               <button onClick={() => setLang("en")} className={`flex-1 py-1.5 rounded text-xs font-medium ${lang === "en" ? "bg-purple-600 text-white" : darkMode ? "text-gray-400 hover:text-white hover:bg-gray-700" : "text-gray-600 hover:text-gray-900 hover:bg-gray-100"}`}>EN</button>
@@ -131,7 +129,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Dark Mode Toggle */}
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <button onClick={() => setDarkMode(!darkMode)} className={`flex items-center gap-2 w-full px-2 py-1.5 rounded ${darkMode ? "text-gray-300 hover:bg-gray-700" : "text-gray-700 hover:bg-gray-100"}`}>
               <span>{darkMode ? "☀️" : "🌙"}</span>
@@ -139,7 +136,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* User */}
           <div className="p-3 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-lg bg-purple-600/70 flex items-center justify-center text-white text-sm font-bold">F</div>
@@ -148,9 +144,7 @@ export default function Home() {
           </div>
         </aside>
 
-        {/* MAIN CONTENT */}
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
           <header className={`flex items-center gap-3 px-4 py-3 border-b ${darkMode ? "border-gray-700 bg-gray-800/80" : "border-gray-200 bg-white/80"} backdrop-blur-sm`}>
             <button onClick={() => setMobileMenuOpen(true)} className="md:hidden p-1 rounded">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -158,7 +152,6 @@ export default function Home() {
             <h1 className={`text-base font-semibold flex-1 ${darkMode ? "text-white" : "text-gray-800"}`}>{activeTab === "chat" ? "💬 Chat" : activeTab === "tickets" ? "🎫 Tickets" : "⚙️ Settings"}</h1>
           </header>
 
-          {/* CHAT TAB */}
           {activeTab === "chat" && (
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -185,7 +178,7 @@ export default function Home() {
               </div>
 
               <div className="px-4 pb-2 flex gap-2 flex-wrap">
-                {t.suggestions.map(s => (
+                {t.suggestions.map((s: string) => (
                   <button key={s} onClick={() => sendMessage(s)} className={`text-xs px-2 py-1 rounded-full border transition-all ${darkMode ? "border-gray-600 text-gray-400 hover:border-purple-500 hover:text-purple-400" : "border-gray-300 text-gray-600 hover:border-purple-500 hover:text-purple-600"}`}>
                     {s}
                   </button>
@@ -202,7 +195,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* TICKETS TAB */}
           {activeTab === "tickets" && (
             <div className="flex-1 overflow-auto p-4">
               <div className={`rounded-lg border overflow-hidden ${darkMode ? "border-gray-700" : "border-gray-200"}`}>
@@ -217,17 +209,13 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {ticketsData.map(t => (
+                    {ticketsData.map((t) => (
                       <tr key={t.id} className={`border-b ${darkMode ? "border-gray-700" : "border-gray-100"}`}>
                         <td className={`px-4 py-2 text-xs font-mono ${darkMode ? "text-gray-400" : "text-gray-500"}`}>{t.id}</td>
                         <td className={`px-4 py-2 text-sm ${darkMode ? "text-gray-200" : "text-gray-700"}`}>{t.customer}</td>
                         <td className={`px-4 py-2 text-sm ${darkMode ? "text-gray-300" : "text-gray-600"}`}>{t.subject}</td>
-                        <td className="px-4 py-2">
-                          <span className={`text-xs px-2 py-0.5 rounded ${t.status === "Open" ? "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400" : t.status === "Resolved" ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400" : "bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400"}`}>{t.status}</span>
-                        </td>
-                        <td className="px-4 py-2">
-                          <span className={`text-xs px-2 py-0.5 rounded ${t.priority === "High" ? "bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400" : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"}`}>{t.priority}</span>
-                        </td>
+                        <td className="px-4 py-2"><span className={`text-xs px-2 py-0.5 rounded ${t.status === "Open" ? "bg-red-100 text-red-600 dark:bg-red-500/20 dark:text-red-400" : t.status === "Resolved" ? "bg-green-100 text-green-600 dark:bg-green-500/20 dark:text-green-400" : "bg-yellow-100 text-yellow-600 dark:bg-yellow-500/20 dark:text-yellow-400"}`}>{t.status}</span></td>
+                        <td className="px-4 py-2"><span className={`text-xs px-2 py-0.5 rounded ${t.priority === "High" ? "bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400" : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400"}`}>{t.priority}</span></td>
                       </tr>
                     ))}
                   </tbody>
@@ -236,7 +224,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* SETTINGS TAB */}
           {activeTab === "settings" && (
             <div className="flex-1 overflow-auto p-4">
               <div className="max-w-md mx-auto space-y-4">
